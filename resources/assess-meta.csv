@@ -1,0 +1,50 @@
+name,description,type
+hadm_id,hospital admission ID,base
+ds_row_id,discharge summary note ID,base
+ds_tot_tok,discharge summary total tokens,base
+ds_tot_char,discharge summary total characters,base
+annotator,the human annotator of the discharge summary,base
+comment_id,comment ID,base
+ds_text,the discharge summary text that was selected in the MS Word doc,base
+ds_tok,discharge summary token count that comes from the selected text,base
+ds_char,discharge summary character count that comes from the selected text,base
+ds_sec_id,discharge summary section ID,base
+ant_row_id,antecedent note ID,base
+ant_cat,antecedent note category,base
+ant_tot_tok,note antecedent token count that comes from the selected text,base
+ant_tot_char,note antecedent character count that comes from the selected text,base
+ant_text,the note antecedent text that was used in the comment text,base
+ant_sec_id,antecedent section ID,base
+ant_tok,note antecedent token count that comes from the text of the comment,base
+ant_char,note antecedent character count that comes from the text of the comment,base
+levenshtein,a similiarty [0-1] measure of the edit distance,base
+bertscore,a semantic similarity measure,base
+rouge1_f_score,the ROUGE1 F1 unigram score,base
+rouge2_f_score,the ROUGE2 F1 bigram score,base
+rougeL_f_score,the ROUGEL F1 longest length score,base
+bleu,the Bleu score,base
+semeval_partial_f_score,the SemEval19 partial F1 score,base
+ds_tot_toks,the total number of discharge summary tokens,coverage
+ds_tot_chars,the total number of discharge summary characters,coverage
+ds_match_toks,the number of matched discharge summary tokens,coverage
+ds_match_chars,the number of matched discharge summary characters,coverage
+ds_portion_toks,the ratio of discharge summary tokens to total discharge summary tokens,coverage
+ds_portion_chars,the ratio of discharge summary characters to total discharge summary characters,coverage
+ant_tot_toks,the total number of note antecedent tokens,coverage
+ant_tot_chars,the total number of note antecedent characters,coverage
+ant_match_toks,note antecedent matched tokens,coverage
+ant_match_chars,note antecedent matched characters,coverage
+ant_portion_toks,the ratio of note antecedent tokens to total note antecedent tokens,coverage
+ant_portion_chars,the ratio of note antecedent characters to total note antecedent characters,coverage
+category,the note category (i.e. 'Physician'),coverage
+note_count,the total number of notes that matched,coverage
+section,the section identifier (i.e. 'hospital-course'),coverage
+section_count,the total number of sections taht matched,coverage
+n_hadm,the number of annotated admissions,coverage
+n_ds_notes,the number of annotated discharge notes,coverage
+n_ant_notes,the number of antecedent notes,coverage
+n_annotators,the number of annotators,coverage
+n_notes,the total number of annotated notes,coverage
+n_toks,the total number of tokens,covarage
+n_chars,the total number of characters,covarage
+n_matches,the number of matches,coverage

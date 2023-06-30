@@ -1,0 +1,156 @@
+# description: provenance of data objects
+
+dsprov_default:
+  assess_meta_path: 'resource(uic.dsprov): resources/assess-meta.csv'
+  tuned_meta_path: 'resource(uic.dsprov): resources/tuned-meta.csv'
+
+## Annotation
+#
+dsprov_dataframe_describer:
+  class_name: zensols.datdesc.DataFrameDescriber
+  meta_path: '${dsprov_default:assess_meta_path}'
+
+dsprov_writer:
+  class_name: uic.dsprov.writer.ProvenanceWriter
+  adm_dir: 'path: ${default:corpus_dir}/export'
+  reader: 'instance: dsprov_reader'
+  anon_resource: 'instance: mimicsid_anon_resource'
+  adm_notes_file: 'path: ${default:data_dir}/adm-notes.csv'
+  # use the mimic version since we don't need to predict sections
+  corpus: 'application(zensols.mimicsid): mimic_corpus'
+  ascript: 'resource(uic.dsprov): resources/word-read-only.scpt'
+  note_cat_per_admission_limit: 5
+  note_duplicate_length: 300
+
+dsprov_reader:
+  class_name: uic.dsprov.reader.ProvenanceReader
+  adm_dir: 'path: ${default:corpus_dir}/completed'
+
+dsprov_dsanon_stash:
+  class_name: uic.dsprov.DischargeSummaryAnnotationStash
+  corpus: 'application(zensols.mimicsid): mimic_corpus'
+  reader: 'instance: dsprov_reader'
+
+dsprov_note_matcher:
+  class_name: uic.dsprov.NoteMatcher
+  corpus: 'application(zensols.mimicsid): mimic_corpus'
+  dsanon_stash: 'instance: dsprov_dsanon_stash'
+
+dsprov_note_match_set_stash:
+  class_name: uic.dsprov.NoteMatchSetStash
+  dsanon_stash: 'instance: dsprov_dsanon_stash'
+  matcher_name: 'dsprov_note_matcher'
+
+dsprov_match_builder:
+  class_name: uic.dsprov.MatchBuilder
+  corpus: 'application(zensols.mimicsid): mimic_corpus'
+  mimic_note_factory: 'instance: mimic_note_factory'
+  note_match_set_stash: 'instance: dsprov_note_match_set_stash'
+  meta_path: '${dsprov_default:assess_meta_path}'
+  scorer: 'instance: nlp_scorer'
+
+
+## Match annotation stash
+#
+dsprov_match_ann_stash_dir:
+  class_name: zensols.persist.DirectoryStash
+  path: 'path: ${default:data_dir}/match-anon'
+
+dsprov_match_ann_stash_factory:
+  class_name: uic.dsprov.MatchAnnotationSetFactoryStash
+  note_match_set_stash: 'instance: dsprov_note_match_set_stash'
+  match_builder_name: 'dsprov_match_builder'
+
+dsprov_match_ann_stash:
+  class_name: uic.dsprov.MatchAnnotationSetStash
+  delegate: 'instance: dsprov_match_ann_stash_dir'
+  factory: 'instance: dsprov_match_ann_stash_factory'
+
+
+## Match stats
+#
+dsprov_admission_similarity_assessor:
+  class_name: uic.dsprov.AdmissionSimilarityAssessor
+  match_ann_stash: 'instance: dsprov_match_ann_stash'
+  corpus: 'application(zensols.mimicsid): mimic_corpus'
+  note_match_set_stash: 'instance: dsprov_note_match_set_stash'
+  match_builder_name: 'dsprov_match_builder'
+  data_dir: 'path: ${dsprov_default:data_dir}/assessor'
+  results_dir: 'path: ${dsprov_default:results_dir}'
+  dataframe_describer_name: 'dsprov_dataframe_describer'
+
+
+## Prediction
+#
+# non-context word embedding
+word_embedding_doc_decorator:
+  model: 'instance: word2vec_300_embedding'
+  skip_oov: true
+
+# uncomment to use word embeddings, otherwise transformer models are used
+# spanmatch_doc_parser:
+#   document_decorators: >-
+#     instance: list:
+#       filter_empty_sentence_decorator,
+#       update_document_decorator,
+#       word_embedding_doc_decorator
+
+# context word piece embedding
+word_piece_doc_factory:
+  cache_size: '1000'
+  #token_embeddings: 'False'
+
+transformer_sent_fixed_resource:
+  # CLS token (better matching)
+  model_id: cambridgeltl/SapBERT-from-PubMedBERT-fulltext-mean-token
+  # non-mean tokens
+  #model_id: cambridgeltl/SapBERT-from-PubMedBERT-fulltext
+  # bio/clinical
+  #model_id: dmis-lab/biobert-base-cased-v1.2
+  #model_id: emilyalsentzer/Bio_ClinicalBERT
+
+# cached word embeddings in their own file system space
+word_piece_doc_caching_factory_stash:
+  path: >-
+    eval({'import': ['zensols.persist as p']}):
+      Path('${default:data_dir}/word-piece-doc',
+           p.FileTextUtil.normalize_text('${transformer_sent_fixed_resource:model_id}'))
+
+# matcher
+dsprov_pred_matcher:
+  class_name: uic.dsprov.pred.PredictionMatcher
+  doc_parser: 'instance: spanmatch_doc_parser'
+  matcher: 'instance: spanmatch_matcher'
+  admission_similarity_assessor: 'instance: dsprov_admission_similarity_assessor'
+
+
+## Annotation extration
+dsprov_anon_extractor:
+  class_name: uic.dsprov.AnnotationExtractor
+  match_ann_stash: 'instance: dsprov_match_ann_stash'
+
+
+## Hyperparameter optimization
+#
+nlp_scorer:
+  default_methods: >-
+    set: rouge1, rouge2, rougeL, bleu, levenshtein, bertscore, semeval
+  methods: >-
+    instance: dict: {
+      ${nlp_scorer_methods:exact_match}
+      ${nlp_scorer_methods:levenshtein}
+      ${nlp_scorer_methods:bleu}
+      ${nlp_scorer_methods:rouge}
+      ${nlp_ner_scorer_methods:semeval},
+      ${deepnlp_scorer_methods:bertscore},
+      }
+
+nlp_bleu_score_method:
+  silence_warnings: true
+
+dsprov_tuned_dataframe_describer:
+  class_name: zensols.datdesc.DataFrameDescriber
+  meta_path: '${dsprov_default:tuned_meta_path}'
+
+dsprov_tuned_data_describer:
+  class_name: zensols.datdesc.DataDescriber
