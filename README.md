@@ -13,6 +13,10 @@ paper](dist/dsprov-annotations.json) and classes for creating discharge summary
 from where physicians copy/paste and/or summarize previous medical records when
 writing discharge summaries.
 
+The project also used an automated method for [note
+matching](https://github.com/plandes/spanmatch) and an automated method for
+[note segmentation](https://github.com/uic-nlp-lab/medsecid).
+
 
 ## Inclusion in Your Projects
 
