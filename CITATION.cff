@@ -33,7 +33,7 @@ preferred-citation:
       family-names: Di Eugenio
       affiliation: University of Illinois at Chicago
   title: 'Hospital Discharge Summarization Data Provenance'
-  url: https://example.com
+  url: https://aclanthology.org/2023.bionlp-1.41
   year: 2023
   conference:
     name: Proceedings of the 22st Workshop on Biomedical Language Processing
