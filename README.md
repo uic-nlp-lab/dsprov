@@ -116,3 +116,5 @@ Copyright (c) 2023 Paul Landes
 [zensols.dsprov]: https://github.com/plandes/dsprov
 [Zensols Framework]: https://github.com/plandes/deepnlp
 [Postgres instructions]: https://github.com/MIT-LCP/mimic-code/blob/main/mimic-iii/buildmimic/postgres/README.md
+
+[Zensols Framework]: https://github.com/plandes/deepnlp
