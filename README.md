@@ -3,8 +3,8 @@
 [![Python 3.10][python310-badge]][python310-link]
 
 This repository contains source code for the paper [Hospital Discharge
-Summarization Data Provenance](https://example.com).  If you only want to use
-the annotations, see the [Inclusion in Your
+Summarization Data Provenance](https://aclanthology.org/2023.bionlp-1.41/).  If
+you only want to use the annotations, see the [Inclusion in Your
 Projects](#inclusion-in-your-projects) section.
 
 This repository contains the [annotations used in the
