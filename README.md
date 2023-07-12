@@ -5,7 +5,9 @@
 This repository contains source code for the paper [Hospital Discharge
 Summarization Data Provenance](https://aclanthology.org/2023.bionlp-1.41/).  If
 you only want to use the annotations, see the [Inclusion in Your
-Projects](#inclusion-in-your-projects) section.
+Projects](#inclusion-in-your-projects) section.  The unsupervised automated
+method code is also located in a [separate
+repository](https://github.com/plandes/spanmatch).
 
 This repository contains the [annotations used in the
 paper](dist/dsprov-annotations.json) and classes for creating discharge summary
